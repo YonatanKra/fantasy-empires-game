@@ -1,47 +1,47 @@
 import { Delaunay } from "d3-delaunay";
 
 function randomColor() {
-    // Generate a random pastel color
     const hue = Math.floor(Math.random() * 360);
     return `hsl(${hue}, 60%, 65%)`;
 }
 
-// Generate random points as territory centers
-function generatePoints(count: number, width: number, height: number): [number, number][] {
+export function generateMap(count: number, width: number, height: number) {
     const points: [number, number][] = [];
+    const colors: string[] = [];
     for (let i = 0; i < count; i++) {
         points.push([
             Math.random() * width,
             Math.random() * height
         ]);
+        colors.push(randomColor());
     }
-    return points;
+    const delaunay = Delaunay.from(points);
+    const voronoi = delaunay.voronoi([0, 0, width, height]);
+    return { points, voronoi, width, height, colors };
 }
 
-function drawVoronoiTerritories(canvas: HTMLCanvasElement, count: number) {
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw 'No Context on Canvas';
-    const points = generatePoints(count, canvas.width, canvas.height);
-    const delaunay = Delaunay.from(points);
-    const voronoi = delaunay.voronoi([0, 0, canvas.width, canvas.height]);
-
-    for (let i = 0; i < points.length; i++) {
-        const cell = voronoi.cellPolygon(i);
+export function drawViewport(
+    ctx: CanvasRenderingContext2D,
+    map: ReturnType<typeof generateMap>,
+    viewX: number,
+    viewY: number,
+    viewWidth: number,
+    viewHeight: number
+) {
+    ctx.clearRect(0, 0, viewWidth, viewHeight);
+    for (let i = 0; i < map.points.length; i++) {
+        const cell = map.voronoi.cellPolygon(i);
         if (!cell) continue;
         ctx.beginPath();
-        ctx.moveTo(cell[0][0], cell[0][1]);
+        ctx.moveTo(cell[0][0] - viewX, cell[0][1] - viewY);
         for (let j = 1; j < cell.length; j++) {
-            ctx.lineTo(cell[j][0], cell[j][1]);
+            ctx.lineTo(cell[j][0] - viewX, cell[j][1] - viewY);
         }
         ctx.closePath();
-        ctx.fillStyle = randomColor();
+        ctx.fillStyle = map.colors[i];
         ctx.fill();
         ctx.strokeStyle = 'rgba(0,0,0,0.7)';
         ctx.lineWidth = 2;
         ctx.stroke();
     }
-}
-
-export function drawTerritories(canvas: HTMLCanvasElement, count: number) {
-    return drawVoronoiTerritories(canvas, count);
 }
