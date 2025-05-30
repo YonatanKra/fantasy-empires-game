@@ -1,0 +1,20 @@
+{
+  "name": "my-vite-vitest-app",
+  "version": "1.0.0",
+  "description": "A Vite project with Vitest for testing",
+  "main": "src/main.ts",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "vite": "^4.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT"
+}
