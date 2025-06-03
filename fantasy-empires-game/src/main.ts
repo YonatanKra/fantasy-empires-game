@@ -3,8 +3,8 @@ import { Territories } from "./territories/territories";
 
 const canvas = document.getElementById('game') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
-canvas.width = 900;
-canvas.height = 400;
+canvas.width = 1200;
+canvas.height = 800;
 
 // Large map size
 const MAP_WIDTH = 3000;
@@ -47,23 +47,39 @@ window.addEventListener('keydown', (e) => {
 // Mouse drag navigation
 let dragging = false;
 let lastX = 0, lastY = 0;
+let mouseDownX = 0, mouseDownY = 0;
+let dragMoved = false;
+const DRAG_THRESHOLD = 5;
+
 canvas.addEventListener('mousedown', (e) => {
     dragging = true;
     lastX = e.clientX;
     lastY = e.clientY;
+    mouseDownX = e.clientX;
+    mouseDownY = e.clientY;
+    dragMoved = false;
 });
+
 window.addEventListener('mousemove', (e) => {
     if (!dragging) return;
     const dx = e.clientX - lastX;
     const dy = e.clientY - lastY;
+    if (Math.abs(e.clientX - mouseDownX) > DRAG_THRESHOLD || Math.abs(e.clientY - mouseDownY) > DRAG_THRESHOLD) {
+        dragMoved = true;
+    }
     viewX = Math.max(0, Math.min(MAP_WIDTH - canvas.width, viewX - dx));
     viewY = Math.max(0, Math.min(MAP_HEIGHT - canvas.height, viewY - dy));
     lastX = e.clientX;
     lastY = e.clientY;
     render();
 });
-window.addEventListener('mouseup', () => dragging = false);
+
+window.addEventListener('mouseup', (e) => {
+    dragging = false;
+});
+
 canvas.addEventListener('click', (e) => {
+    if (dragMoved) return; // Only open dialog if not a drag
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left + viewX;
     const y = e.clientY - rect.top + viewY;
