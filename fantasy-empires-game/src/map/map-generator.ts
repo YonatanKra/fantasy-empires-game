@@ -1,11 +1,19 @@
-import { Delaunay } from "d3-delaunay";
+import { Delaunay, Voronoi } from "d3-delaunay";
 
 function randomColor() {
     const hue = Math.floor(Math.random() * 360);
     return `hsl(${hue}, 60%, 65%)`;
 }
 
-export function generateMap(count: number, width: number, height: number) {
+export type GeneratedMap = {
+    points: [number, number][];
+    voronoi: Voronoi<[number, number]>;
+    width: number;
+    height: number;
+    colors: string[];
+};
+
+export function generateMap(count: number, width: number, height: number): GeneratedMap {
     const points: [number, number][] = [];
     const colors: string[] = [];
     for (let i = 0; i < count; i++) {
