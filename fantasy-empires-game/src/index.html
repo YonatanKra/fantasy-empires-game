@@ -1,13 +1,23 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8" />
     <title>Fantasy Empires</title>
 </head>
+
 <body>
     <div id="game-wrapper">
         <canvas id="game"></canvas>
     </div>
+    <dialog id="territory-dialog">
+        <form method="dialog">
+            <h2 id="territory-name"></h2>
+            <p>Income: <span id="territory-income"></span> gold/turn</p>
+            <button>Close</button>
+        </form>
+    </dialog>
     <script type="module" src="./main.ts"></script>
 </body>
+
 </html>

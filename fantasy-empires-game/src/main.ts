@@ -1,5 +1,5 @@
 import { generateMap, drawViewport } from "./map/map-generator";
-
+import { Territories } from "./territories/territories";
 
 const canvas = document.getElementById('game') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
@@ -18,6 +18,16 @@ let viewY = 0;
 // Generate the map once
 const map = generateMap(TERRITORY_COUNT, MAP_WIDTH, MAP_HEIGHT);
 
+const territories = new Territories();
+for (let i = 0; i < map.points.length; i++) {
+    const cell = map.voronoi.cellPolygon(i);
+    if (!cell) continue;
+    territories.addTerritory({
+        name: `Territory ${i + 1}`,
+        income: Math.round(Math.random() * 3000 + 1000),
+        polygon: cell
+    });
+}
 // Draw the current viewport
 function render() {
     drawViewport(ctx, map, viewX, viewY, canvas.width, canvas.height);
@@ -53,4 +63,15 @@ window.addEventListener('mousemove', (e) => {
     render();
 });
 window.addEventListener('mouseup', () => dragging = false);
-
+canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left + viewX;
+    const y = e.clientY - rect.top + viewY;
+    const territory = territories.findTerritoryAt(x, y);
+    if (territory) {
+        const dialog = document.getElementById('territory-dialog') as HTMLDialogElement;
+        (document.getElementById('territory-name') as HTMLElement).textContent = territory.name;
+        (document.getElementById('territory-income') as HTMLElement).textContent = territory.income.toString();
+        dialog.showModal();
+    }
+});
